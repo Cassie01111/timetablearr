@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>马来西亚课程排课系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #f0f4f8;
+        }
+        
+        .timetable-cell {
+            min-height: 80px;
+            transition: all 0.2s;
+        }
+        
+        .timetable-cell:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .subject-item {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .subject-item:hover {
+            transform: translateY(-2px);
+        }
+        
+        .grade-tab.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .modal {
+            transition: opacity 0.3s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .timetable-container {
+                overflow-x: auto;
+            }
+        }
+        
+        .conflict-warning {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+        }
+        
+        .auto-scheduled {
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+        <header class="bg-white shadow-md">
+            <div class="container mx-auto px-4 py-6">
+                <div class="flex flex-col md:flex-row md:justify-between md:items-center">
+                    <h1 class="text-2xl md:text-3xl font-bold text-indigo-800 mb-4 md:mb-0">马来西亚课程排课系统</h1>
+                    <div class="flex flex-wrap gap-2">
+                        <button id="teacherManageBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md shadow transition">
+                            教师管理
+                        </button>
+                        <button id="autoScheduleBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md shadow transition">
+                            智能排课
+                        </button>
+                        <button id="saveBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md shadow transition">
+                            保存排课
+                        </button>
+                        <button id="resetBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md shadow transition">
+                            重置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="container mx-auto px-4 py-8">
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                <div class="flex flex-wrap gap-4 mb-6">
+                    <div class="w-full md:w-1/2 lg:w-1/3">
+                        <h2 class="text-lg font-semibold text-gray-700 mb-3">选择年级</h2>
+                        <div class="flex flex-wrap gap-2" id="gradeTabs">
+                            <button class="grade-tab px-4 py-2 rounded-md bg-gray-200 hover:bg-blue-500 hover:text-white transition" data-grade="1">一年级</button>
+                            <button class="grade-tab px-4 py-2 rounded-md bg-gray-200 hover:bg-blue-500 hover:text-white transition" data-grade="2">二年级</button>
+                            <button class="grade-tab px-4 py-2 rounded-md bg-gray-200 hover:bg-blue-500 hover:text-white transition" data-grade="3">三年级</button>
+                            <button class="grade-tab px-4 py-2 rounded-md bg-gray-200 hover:bg-blue-500 hover:text-white transition" data-grade="4">四年级</button>
+                            <button class="grade-tab px-4 py-2 rounded-md bg-gray-200 hover:bg-blue-500 hover:text-white transition" data-grade="5">五年级</button>
+                        </div>
+                    </div>
+                    
+                    <div class="w-full md:w-1/2 lg:w-2/3">
+                        <h2 class="text-lg font-semibold text-gray-700 mb-3">可用科目</h2>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2" id="subjectList">
+                            <!-- 科目列表将通过JS动态生成 -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timetable-container overflow-x-auto">
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr>
+                                <th class="border p-2 bg-gray-100">时段 / 星期</th>
+                                <th class="border p-2 bg-gray-100">星期一</th>
+                                <th class="border p-2 bg-gray-100">星期二</th>
+                                <th class="border p-2 bg-gray-100">星期三</th>
+                                <th class="border p-2 bg-gray-100">星期四</th>
+                                <th class="border p-2 bg-gray-100">星期五</th>
+                            </tr>
+                        </thead>
+                        <tbody id="timetableBody">
+                            <tr>
+                                <td class="border p-2 bg-gray-50 font-medium">8:00 - 9:00</td>
+                                <td class="border p-2 timetable-cell" data-day="1" data-period="1"></td>
+                                <td class="border p-2 timetable-cell" data-day="2" data-period="1"></td>
+                                <td class="border p-2 timetable-cell" data-day="3" data-period="1"></td>
+                                <td class="border p-2 timetable-cell" data-day="4" data-period="1"></td>
+                                <td class="border p-2 timetable-cell" data-day="5" data-period="1"></td>
+                            </tr>
+                            <tr>
+                                <td class="border p-2 bg-gray-50 font-medium">9:00 - 10:00</td>
+                                <td class="border p-2 timetable-cell" data-day="1" data-period="2"></td>
+                                <td class="border p-2 timetable-cell" data-day="2" data-period="2"></td>
+                                <td class="border p-2 timetable-cell" data-day="3" data-period="2"></td>
+                                <td class="border p-2 timetable-cell" data-day="4" data-period="2"></td>
+                                <td class="border p-2 timetable-cell" data-day="5" data-period="2"></td>
+                            </tr>
+                            <tr>
+                                <td class="border p-2 bg-gray-50 font-medium">10:00 - 11:00</td>
+                                <td class="border p-2 timetable-cell" data-day="1" data-period="3"></td>
+                                <td class="border p-2 timetable-cell" data-day="2" data-period="3"></td>
+                                <td class="border p-2 timetable-cell" data-day="3" data-period="3"></td>
+                                <td class="border p-2 timetable-cell" data-day="4" data-period="3"></td>
+                                <td class="border p-2 timetable-cell" data-day="5" data-period="3"></td>
+                            </tr>
+                            <tr>
+                                <td class="border p-2 bg-gray-50 font-medium">11:00 - 12:00</td>
+                                <td class="border p-2 timetable-cell" data-day="1" data-period="4"></td>
+                                <td class="border p-2 timetable-cell" data-day="2" data-period="4"></td>
+                                <td class="border p-2 timetable-cell" data-day="3" data-period="4"></td>
+                                <td class="border p-2 timetable-cell" data-day="4" data-period="4"></td>
+                                <td class="border p-2 timetable-cell" data-day="5" data-period="4"></td>
+                            </tr>
+                            <tr>
+                                <td class="border p-2 bg-gray-50 font-medium">12:00 - 13:00</td>
+                                <td class="border p-2 timetable-cell" data-day="1" data-period="5"></td>
+                                <td class="border p-2 timetable-cell" data-day="2" data-period="5"></td>
+                                <td class="border p-2 timetable-cell" data-day="3" data-period="5"></td>
+                                <td class="border p-2 timetable-cell" data-day="4" data-period="5"></td>
+                                <td class="border p-2 timetable-cell" data-day="5" data-period="5"></td>
+                            </tr>
+                            <tr>
+                                <td class="border p-2 bg-gray-50 font-medium">13:00 - 14:00</td>
+                                <td class="border p-2 timetable-cell" data-day="1" data-period="6"></td>
+                                <td class="border p-2 timetable-cell" data-day="2" data-period="6"></td>
+                                <td class="border p-2 timetable-cell" data-day="3" data-period="6"></td>
+                                <td class="border p-2 timetable-cell" data-day="4" data-period="6"></td>
+                                <td class="border p-2 timetable-cell" data-day="5" data-period="6"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">课程统计</h2>
+                <div id="statsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- 统计信息将通过JS动态生成 -->
+                </div>
+            </div>
+        </main>
+
+        <!-- 编辑课程的模态框 -->
+        <div id="editModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+            <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">编辑课程</h3>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">选择科目:</label>
+                    <select id="editSubject" class="w-full p-2 border rounded-md">
+                        <option value="">-- 请选择科目 --</option>
+                        <!-- 科目选项将通过JS动态生成 -->
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">教师:</label>
+                    <select id="editTeacher" class="w-full p-2 border rounded-md">
+                        <option value="">-- 请选择教师 --</option>
+                        <!-- 教师选项将通过JS动态生成 -->
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">备注:</label>
+                    <textarea id="editNotes" class="w-full p-2 border rounded-md" rows="2" placeholder="添加备注"></textarea>
+                </div>
+                <div id="conflictWarning" class="mb-4 hidden">
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+                        <strong class="font-bold">警告!</strong>
+                        <span class="block sm:inline" id="conflictMessage"></span>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button id="deleteBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md">删除</button>
+                    <button id="cancelBtn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md">取消</button>
+                    <button id="saveEditBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">保存</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 教师管理模态框 -->
+        <div id="teacherModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+            <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">教师管理</h3>
+                <div class="mb-6">
+                    <div class="flex flex-wrap gap-4 mb-4">
+                        <div class="w-full md:w-1/3">
+                            <label class="block text-gray-700 mb-2">教师姓名:</label>
+                            <input type="text" id="newTeacherName" class="w-full p-2 border rounded-md" placeholder="输入教师姓名">
+                        </div>
+                        <div class="w-full md:w-1/3">
+                            <label class="block text-gray-700 mb-2">教授科目:</label>
+                            <select id="newTeacherSubject" class="w-full p-2 border rounded-md">
+                                <option value="">-- 请选择科目 --</option>
+                                <!-- 科目选项将通过JS动态生成 -->
+                            </select>
+                        </div>
+                        <div class="w-full md:w-1/3 flex items-end">
+                            <button id="addTeacherBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md w-full">添加教师</button>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border">
+                            <thead>
+                                <tr>
+                                    <th class="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left">教师姓名</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left">教授科目</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 bg-gray-100 text-center">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teacherTableBody">
+                                <!-- 教师列表将通过JS动态生成 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="flex justify-end">
+                    <button id="closeTeacherModalBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 智能排课模态框 -->
+        <div id="autoScheduleModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+            <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">智能排课设置</h3>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">科目课时分配:</label>
+                    <div id="subjectHoursContainer" class="space-y-2">
+                        <!-- 科目课时设置将通过JS动态生成 -->
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">排课规则:</label>
+                    <div class="space-y-2">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="avoidConflicts" class="mr-2" checked>
+                            <label for="avoidConflicts">避免教师冲突</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="balanceSubjects" class="mr-2" checked>
+                            <label for="balanceSubjects">平衡每日科目分布</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="prioritizeMainSubjects" class="mr-2" checked>
+                            <label for="prioritizeMainSubjects">优先安排主要科目在上午时段</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-2">
+                    <button id="cancelAutoScheduleBtn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md">取消</button>
+                    <button id="startAutoScheduleBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md">开始排课</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 排课进度模态框 -->
+        <div id="schedulingProgressModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+            <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md text-center">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">正在进行智能排课</h3>
+                <div class="mb-4">
+                    <div class="w-full bg-gray-200 rounded-full h-4">
+                        <div id="progressBar" class="bg-purple-600 h-4 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <p id="progressText" class="mt-2">准备中...</p>
+                </div>
+                <div id="schedulingResults" class="mb-4 text-left hidden">
+                    <h4 class="font-semibold mb-2">排课结果:</h4>
+                    <ul id="schedulingResultsList" class="list-disc pl-5 space-y-1">
+                        <!-- 排课结果将通过JS动态生成 -->
+                    </ul>
+                </div>
+                <button id="closeProgressBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md hidden">关闭</button>
+            </div>
+        </div>
+
+        <!-- 保存成功提示 -->
+        <div id="saveNotification" class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-md shadow-lg transform translate-y-20 opacity-0 transition-all duration-300">
+            排课表已成功保存！
+        </div>
+        
+        <!-- 冲突提示 -->
+        <div id="conflictNotification" class="fixed bottom-4 right-4 bg-red-500 text-white px-6 py-3 rounded-md shadow-lg transform translate-y-20 opacity-0 transition-all duration-300">
+            检测到教师课程冲突！
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化变量
+            let currentGrade = 1;
+            let timetableData = {};
+            let currentCell = null;
+            let teachers = [
+                { id: 1, name: '林老师', subject: '马来语' },
+                { id: 2, name: '王老师', subject: '英语' },
+                { id: 3, name: '张老师', subject: '数学' },
+                { id: 4, name: '李老师', subject: '科学' },
+                { id: 5, name: '陈老师', subject: '历史' },
+                { id: 6, name: '黄老师', subject: '地理' },
+                { id: 7, name: '吴老师', subject: '体育' },
+                { id: 8, name: '刘老师', subject: '美术' }
+            ];
+            
+            const subjects = [
+                { name: '马来语', bgColor: 'bg-blue-100', textColor: 'text-blue-800', isMain: true, defaultHours: 5 },
+                { name: '英语', bgColor: 'bg-green-100', textColor: 'text-green-800', isMain: true, defaultHours: 5 },
+                { name: '数学', bgColor: 'bg-yellow-100', textColor: 'text-yellow-800', isMain: true, defaultHours: 5 },
+                { name: '科学', bgColor: 'bg-red-100', textColor: 'text-red-800', isMain: true, defaultHours: 4 },
+                { name: '历史', bgColor: 'bg-purple-100', textColor: 'text-purple-800', isMain: false, defaultHours: 2 },
+                { name: '地理', bgColor: 'bg-pink-100', textColor: 'text-pink-800', isMain: false, defaultHours: 2 },
+                { name: '体育', bgColor: 'bg-indigo-100', textColor: 'text-indigo-800', isMain: false, defaultHours: 2 },
+                { name: '美术', bgColor: 'bg-orange-100', textColor: 'text-orange-800', isMain: false, defaultHours: 2 }
+            ];
+            
+            // 初始化年级数据
+            for (let grade = 1; grade <= 5; grade++) {
+                timetableData[grade] = {};
+            }
+            
+            // 渲染科目列表
+            function renderSubjectList() {
+                const subjectList = document.getElementById('subjectList');
+                subjectList.innerHTML = '';
+                
+                subjects.forEach(subject => {
+                    const subjectTeachers = teachers.filter(teacher => teacher.subject === subject.name);
+                    const teacherNames = subjectTeachers.map(teacher => teacher.name).join(', ');
+                    
+                    const subjectItem = document.createElement('div');
+                    subjectItem.className = `subject-item p-3 ${subject.bgColor} ${subject.textColor} rounded-md shadow-sm`;
+                    subjectItem.setAttribute('draggable', 'true');
+                    subjectItem.setAttribute('data-subject', subject.name);
+                    
+                    subjectItem.innerHTML = `
+                        <div class="font-medium">${subject.name}</div>
+                        <div class="text-xs mt-1">${teacherNames || '无教师'}</div>
+                    `;
+                    
+                    subjectItem.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', subject.name);
+                    });
+                    
+                    subjectList.appendChild(subjectItem);
+                });
+            }
+            
+            // 初始化科目下拉菜单
+            function initSubjectDropdown() {
+                const editSubject = document.getElementById('editSubject');
+                const newTeacherSubject = document.getElementById('newTeacherSubject');
+                
+                editSubject.innerHTML = '<option value="">-- 请选择科目 --</option>';
+                newTeacherSubject.innerHTML = '<option value="">-- 请选择科目 --</option>';
+                
+                subjects.forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject.name;
+                    option.textContent = subject.name;
+                    
+                    editSubject.appendChild(option.cloneNode(true));
+                    newTeacherSubject.appendChild(option);
+                });
+            }
+            
+            // 更新教师下拉菜单
+            function updateTeacherDropdown(selectedSubject = '') {
+                const editTeacher = document.getElementById('editTeacher');
+                editTeacher.innerHTML = '<option value="">-- 请选择教师 --</option>';
+                
+                if (selectedSubject) {
+                    const filteredTeachers = teachers.filter(teacher => teacher.subject === selectedSubject);
+                    
+                    filteredTeachers.forEach(teacher => {
+                        const option = document.createElement('option');
+                        option.value = teacher.id;
+                        option.textContent = teacher.name;
+                        editTeacher.appendChild(option);
+                    });
+                }
+            }
+            
+            // 渲染教师表格
+            function renderTeacherTable() {
+                const teacherTableBody = document.getElementById('teacherTableBody');
+                teacherTableBody.innerHTML = '';
+                
+                teachers.forEach(teacher => {
+                    const row = document.createElement('tr');
+                    
+                    // 找到对应科目的颜色
+                    const subject = subjects.find(s => s.name === teacher.subject);
+                    const bgColor = subject ? subject.bgColor.replace('bg-', 'bg-opacity-50 bg-') : 'bg-gray-100';
+                    
+                    row.className = bgColor;
+                    row.innerHTML = `
+                        <td class="py-2 px-4 border-b border-gray-200">${teacher.name}</td>
+                        <td class="py-2 px-4 border-b border-gray-200">${teacher.subject}</td>
+                        <td class="py-2 px-4 border-b border-gray-200 text-center">
+                            <button class="delete-teacher-btn bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded-md text-sm" data-id="${teacher.id}">删除</button>
+                        </td>
+                    `;
+                    
+                    teacherTableBody.appendChild(row);
+                });
+                
+                // 添加删除教师事件
+                document.querySelectorAll('.delete-teacher-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const teacherId = parseInt(btn.dataset.id);
+                        teachers = teachers.filter(teacher => teacher.id !== teacherId);
+                        renderTeacherTable();
+                        renderSubjectList();
+                    });
+                });
+            }
+            
+            // 选择年级
+            const gradeTabs = document.querySelectorAll('.grade-tab');
+            gradeTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    gradeTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentGrade = parseInt(tab.dataset.grade);
+                    loadTimetable(currentGrade);
+                });
+            });
+            
+            // 默认选中第一个年级
+            gradeTabs[0].click();
+            
+            // 拖拽功能
+            const cells = document.querySelectorAll('.timetable-cell');
+            cells.forEach(cell => {
+                // 允许放置
+                cell.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    cell.classList.add('bg-blue-50');
+                });
+                
+                // 离开时移除高亮
+                cell.addEventListener('dragleave', () => {
+                    cell.classList.remove('bg-blue-50');
+                });
+                
+                // 放置科目
+                cell.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    cell.classList.remove('bg-blue-50');
+                    const subject = e.dataTransfer.getData('text/plain');
+                    const day = cell.dataset.day;
+                    const period = cell.dataset.period;
+                    
+                    // 获取该科目的第一位教师
+                    const subjectTeachers = teachers.filter(teacher => teacher.subject === subject);
+                    const teacherId = subjectTeachers.length > 0 ? subjectTeachers[0].id : '';
+                    
+                    // 检查教师冲突
+                    if (teacherId) {
+                        const conflict = checkTeacherConflict(currentGrade, day, period, teacherId);
+                        if (conflict) {
+                            showConflictNotification(conflict);
+                        }
+                    }
+                    
+                    // 保存数据
+                    if (!timetableData[currentGrade][day]) {
+                        timetableData[currentGrade][day] = {};
+                    }
+                    
+                    timetableData[currentGrade][day][period] = {
+                        subject: subject,
+                        teacherId: teacherId,
+                        notes: ''
+                    };
+                    
+                    // 更新UI
+                    updateCell(cell, timetableData[currentGrade][day][period]);
+                    updateStats();
+                });
+                
+                // 点击编辑
+                cell.addEventListener('click', () => {
+                    const day = cell.dataset.day;
+                    const period = cell.dataset.period;
+                    
+                    if (timetableData[currentGrade][day] && timetableData[currentGrade][day][period]) {
+                        openEditModal(cell, timetableData[currentGrade][day][period]);
+                    } else {
+                        openEditModal(cell, { subject: '', teacherId: '', notes: '' });
+                    }
+                });
+            });
+            
+            // 编辑模态框
+            const editModal = document.getElementById('editModal');
+            const editSubject = document.getElementById('editSubject');
+            const editTeacher = document.getElementById('editTeacher');
+            const editNotes = document.getElementById('editNotes');
+            const saveEditBtn = document.getElementById('saveEditBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const deleteBtn = document.getElementById('deleteBtn');
+            const conflictWarning = document.getElementById('conflictWarning');
+            const conflictMessage = document.getElementById('conflictMessage');
+            
+            // 科目选择变更时更新教师下拉菜单
+            editSubject.addEventListener('change', () => {
+                updateTeacherDropdown(editSubject.value);
+                
+                // 检查冲突
+                if (currentCell && editSubject.value && editTeacher.value) {
+                    const day = currentCell.dataset.day;
+                    const period = currentCell.dataset.period;
+                    const conflict = checkTeacherConflict(currentGrade, day, period, parseInt(editTeacher.value));
+                    
+                    if (conflict) {
+                        conflictWarning.classList.remove('hidden');
+                        conflictMessage.textContent = conflict;
+                    } else {
+                        conflictWarning.classList.add('hidden');
+                    }
+                }
+            });
+            
+            // 教师选择变更时检查冲突
+            editTeacher.addEventListener('change', () => {
+                if (currentCell && editTeacher.value) {
+                    const day = currentCell.dataset.day;
+                    const period = currentCell.dataset.period;
+                    const conflict = checkTeacherConflict(currentGrade, day, period, parseInt(editTeacher.value));
+                    
+                    if (conflict) {
+                        conflictWarning.classList.remove('hidden');
+                        conflictMessage.textContent = conflict;
+                    } else {
+                        conflictWarning.classList.add('hidden');
+                    }
+                }
+            });
+            
+            function openEditModal(cell, data) {
+                currentCell = cell;
+                editSubject.value = data.subject || '';
+                updateTeacherDropdown(data.subject);
+                editTeacher.value = data.teacherId || '';
+                editNotes.value = data.notes || '';
+                
+                // 检查冲突
+                conflictWarning.classList.add('hidden');
+                if (data.teacherId) {
+                    const day = cell.dataset.day;
+                    const period = cell.dataset.period;
+                    const conflict = checkTeacherConflict(currentGrade, day, period, data.teacherId);
+                    
+                    if (conflict) {
+                        conflictWarning.classList.remove('hidden');
+                        conflictMessage.textContent = conflict;
+                    }
+                }
+                
+                editModal.classList.remove('hidden');
+            }
+            
+            saveEditBtn.addEventListener('click', () => {
+                const day = currentCell.dataset.day;
+                const period = currentCell.dataset.period;
+                
+                if (!timetableData[currentGrade][day]) {
+                    timetableData[currentGrade][day] = {};
+                }
+                
+                timetableData[currentGrade][day][period] = {
+                    subject: editSubject.value,
+                    teacherId: editTeacher.value ? parseInt(editTeacher.value) : '',
+                    notes: editNotes.value
+                };
+                
+                updateCell(currentCell, timetableData[currentGrade][day][period]);
+                updateStats();
+                editModal.classList.add('hidden');
+            });
+            
+            cancelBtn.addEventListener('click', () => {
+                editModal.classList.add('hidden');
+            });
+            
+            deleteBtn.addEventListener('click', () => {
+                const day = currentCell.dataset.day;
+                const period = currentCell.dataset.period;
+                
+                if (timetableData[currentGrade][day] && timetableData[currentGrade][day][period]) {
+                    delete timetableData[currentGrade][day][period];
+                }
+                
+                currentCell.innerHTML = '';
+                currentCell.className = 'border p-2 timetable-cell';
+                updateStats();
+                editModal.classList.add('hidden');
+            });
+            
+            // 教师管理
+            const teacherManageBtn = document.getElementById('teacherManageBtn');
+            const teacherModal = document.getElementById('teacherModal');
+            const closeTeacherModalBtn = document.getElementById('closeTeacherModalBtn');
+            const addTeacherBtn = document.getElementById('addTeacherBtn');
+            const newTeacherName = document.getElementById('newTeacherName');
+            const newTeacherSubject = document.getElementById('newTeacherSubject');
+            
+            teacherManageBtn.addEventListener('click', () => {
+                renderTeacherTable();
+                teacherModal.classList.remove('hidden');
+            });
+            
+            closeTeacherModalBtn.addEventListener('click', () => {
+                teacherModal.classList.add('hidden');
+            });
+            
+            addTeacherBtn.addEventListener('click', () => {
+                const name = newTeacherName.value.trim();
+                const subject = newTeacherSubject.value;
+                
+                if (name && subject) {
+                    const newId = teachers.length > 0 ? Math.max(...teachers.map(t => t.id)) + 1 : 1;
+                    teachers.push({
+                        id: newId,
+                        name: name,
+                        subject: subject
+                    });
+                    
+                    newTeacherName.value = '';
+                    newTeacherSubject.value = '';
+                    
+                    renderTeacherTable();
+                    renderSubjectList();
+                }
+            });
+            
+            // 智能排课
+            const autoScheduleBtn = document.getElementById('autoScheduleBtn');
+            const autoScheduleModal = document.getElementById('autoScheduleModal');
+            const cancelAutoScheduleBtn = document.getElementById('cancelAutoScheduleBtn');
+            const startAutoScheduleBtn = document.getElementById('startAutoScheduleBtn');
+            const subjectHoursContainer = document.getElementById('subjectHoursContainer');
+            const schedulingProgressModal = document.getElementById('schedulingProgressModal');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const schedulingResults = document.getElementById('schedulingResults');
+            const schedulingResultsList = document.getElementById('schedulingResultsList');
+            const closeProgressBtn = document.getElementById('closeProgressBtn');
+            
+            // 初始化科目课时设置
+            function initSubjectHoursSettings() {
+                subjectHoursContainer.innerHTML = '';
+                
+                subjects.forEach(subject => {
+                    // 计算当前已排课时数
+                    let currentHours = 0;
+                    if (timetableData[currentGrade]) {
+                        for (const day in timetableData[currentGrade]) {
+                            for (const period in timetableData[currentGrade][day]) {
+                                if (timetableData[currentGrade][day][period].subject === subject.name) {
+                                    currentHours++;
+                                }
+                            }
+                        }
+                    }
+                    
+                    // 计算剩余可排课时数
+                    const remainingSlots = 30 - getTotalScheduledHours(); // 更新为6个时段 * 5天 = 30
+                    const maxHours = currentHours + remainingSlots;
+                    
+                    const subjectSetting = document.createElement('div');
+                    subjectSetting.className = `flex items-center justify-between ${subject.bgColor} ${subject.textColor} p-2 rounded-md`;
+                    subjectSetting.innerHTML = `
+                        <div class="font-medium">${subject.name}</div>
+                        <div class="flex items-center">
+                            <span class="mr-2">已排: ${currentHours}</span>
+                            <span class="mr-2">目标:</span>
+                            <input type="number" class="subject-hours-input w-16 p-1 border rounded-md" 
+                                data-subject="${subject.name}" 
+                                value="${Math.min(subject.defaultHours, maxHours)}" 
+                                min="${currentHours}" 
+                                max="${maxHours}">
+                        </div>
+                    `;
+                    
+                    subjectHoursContainer.appendChild(subjectSetting);
+                });
+            }
+            
+            // 获取当前年级已排课时总数
+            function getTotalScheduledHours() {
+                let total = 0;
+                if (timetableData[currentGrade]) {
+                    for (const day in timetableData[currentGrade]) {
+                        for (const period in timetableData[currentGrade][day]) {
+                            total++;
+                        }
+                    }
+                }
+                return total;
+            }
+            
+            // 获取空闲时段
+            function getEmptySlots() {
+                const emptySlots = [];
+                
+                for (let day = 1; day <= 5; day++) {
+                    for (let period = 1; period <= 6; period++) { // 更新为6个时段
+                        if (!timetableData[currentGrade][day] || !timetableData[currentGrade][day][period]) {
+                            emptySlots.push({ day, period });
+                        }
+                    }
+                }
+                
+                return emptySlots;
+            }
+            
+            // 获取科目课时设置
+            function getSubjectHoursSettings() {
+                const settings = {};
+                
+                document.querySelectorAll('.subject-hours-input').forEach(input => {
+                    const subject = input.dataset.subject;
+                    const targetHours = parseInt(input.value) || 0;
+                    
+                    // 计算当前已排课时数
+                    let currentHours = 0;
+                    if (timetableData[currentGrade]) {
+                        for (const day in timetableData[currentGrade]) {
+                            for (const period in timetableData[currentGrade][day]) {
+                                if (timetableData[currentGrade][day][period].subject === subject) {
+                                    currentHours++;
+                                }
+                            }
+                        }
+                    }
+                    
+                    settings[subject] = {
+                        current: currentHours,
+                        target: targetHours,
+                        remaining: targetHours - currentHours
+                    };
+                });
+                
+                return settings;
+            }
+            
+            // 智能排课算法
+            function autoSchedule() {
+                // 获取设置
+                const subjectHours = getSubjectHoursSettings();
+                const avoidConflicts = document.getElementById('avoidConflicts').checked;
+                const balanceSubjects = document.getElementById('balanceSubjects').checked;
+                const prioritizeMainSubjects = document.getElementById('prioritizeMainSubjects').checked;
+                
+                // 获取空闲时段
+                const emptySlots = getEmptySlots();
+                
+                // 如果没有空闲时段，直接返回
+                if (emptySlots.length === 0) {
+                    return { success: true, message: '没有空闲时段可排', scheduled: [] };
+                }
+                
+                // 创建待排课科目列表
+                const subjectsToSchedule = [];
+                for (const subject in subjectHours) {
+                    const remaining = subjectHours[subject].remaining;
+                    if (remaining > 0) {
+                        const subjectInfo = subjects.find(s => s.name === subject);
+                        for (let i = 0; i < remaining; i++) {
+                            subjectsToSchedule.push({
+                                name: subject,
+                                isMain: subjectInfo.isMain
+                            });
+                        }
+                    }
+                }
+                
+                // 如果没有待排课科目，直接返回
+                if (subjectsToSchedule.length === 0) {
+                    return { success: true, message: '没有需要排课的科目', scheduled: [] };
+                }
+                
+                // 如果待排课科目数量超过空闲时段数量，返回错误
+                if (subjectsToSchedule.length > emptySlots.length) {
+                    return { 
+                        success: false, 
+                        message: `待排课科目总数(${subjectsToSchedule.length})超过空闲时段数量(${emptySlots.length})`, 
+                        scheduled: [] 
+                    };
+                }
+                
+                // 根据设置排序科目
+                if (prioritizeMainSubjects) {
+                    subjectsToSchedule.sort((a, b) => {
+                        if (a.isMain && !b.isMain) return -1;
+                        if (!a.isMain && b.isMain) return 1;
+                        return 0;
+                    });
+                }
+                
+                // 初始化每日科目计数
+                const dailySubjectCount = {};
+                for (let day = 1; day <= 5; day++) {
+                    dailySubjectCount[day] = {};
+                    subjects.forEach(subject => {
+                        dailySubjectCount[day][subject.name] = 0;
+                    });
+                    
+                    // 计算已排课的科目数量
+                    if (timetableData[currentGrade][day]) {
+                        for (const period in timetableData[currentGrade][day]) {
+                            const subject = timetableData[currentGrade][day][period].subject;
+                            if (subject) {
+                                dailySubjectCount[day][subject] = (dailySubjectCount[day][subject] || 0) + 1;
+                            }
+                        }
+                    }
+                }
+                
+                // 初始化教师每日课时计数
+                const teacherDailyHours = {};
+                for (let day = 1; day <= 5; day++) {
+                    teacherDailyHours[day] = {};
+                    teachers.forEach(teacher => {
+                        teacherDailyHours[day][teacher.id] = 0;
+                    });
+                    
+                    // 计算已排课的教师课时
+                    if (timetableData[currentGrade][day]) {
+                        for (const period in timetableData[currentGrade][day]) {
+                            const teacherId = timetableData[currentGrade][day][period].teacherId;
+                            if (teacherId) {
+                                teacherDailyHours[day][teacherId] = (teacherDailyHours[day][teacherId] || 0) + 1;
+                            }
+                        }
+                    }
+                }
+                
+                // 初始化教师每时段占用情况
+                const teacherPeriodOccupied = {};
+                for (let day = 1; day <= 5; day++) {
+                    teacherPeriodOccupied[day] = {};
+                    for (let period = 1; period <= 6; period++) { // 更新为6个时段
+                        teacherPeriodOccupied[day][period] = {};
+                    }
+                }
+                
+                // 填充已占用的教师时段
+                for (let grade = 1; grade <= 5; grade++) {
+                    if (timetableData[grade]) {
+                        for (const day in timetableData[grade]) {
+                            for (const period in timetableData[grade][day]) {
+                                const teacherId = timetableData[grade][day][period].teacherId;
+                                if (teacherId) {
+                                    teacherPeriodOccupied[day][period][teacherId] = true;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // 对空闲时段进行排序
+                emptySlots.sort((a, b) => {
+                    // 如果优先安排主要科目在上午
+                    if (prioritizeMainSubjects) {
+                        // 上午时段优先
+                        if (a.period <= 3 && b.period > 3) return -1;
+                        if (a.period > 3 && b.period <= 3) return 1;
+                    }
+                    
+                    return 0;
+                });
+                
+                // 开始排课
+                const scheduled = [];
+                const remainingSubjects = [...subjectsToSchedule];
+                
+                // 为每个科目找到合适的时段
+                while (remainingSubjects.length > 0) {
+                    const subjectToSchedule = remainingSubjects.shift();
+                    let bestSlot = null;
+                    let bestScore = -Infinity;
+                    
+                    // 获取该科目的教师
+                    const subjectTeachers = teachers.filter(teacher => teacher.subject === subjectToSchedule.name);
+                    const teacherId = subjectTeachers.length > 0 ? subjectTeachers[0].id : null;
+                    
+                    // 评估每个空闲时段
+                    for (let i = 0; i < emptySlots.length; i++) {
+                        const slot = emptySlots[i];
+                        let score = 0;
+                        
+                        // 如果避免教师冲突
+                        if (avoidConflicts && teacherId && teacherPeriodOccupied[slot.day][slot.period][teacherId]) {
+                            continue; // 跳过已被该教师占用的时段
+                        }
+                        
+                        // 如果平衡科目分布
+                        if (balanceSubjects) {
+                            // 该日该科目越少，分数越高
+                            score -= dailySubjectCount[slot.day][subjectToSchedule.name] * 2;
+                            
+                            // 该教师在该日课时越少，分数越高
+                            if (teacherId) {
+                                score -= teacherDailyHours[slot.day][teacherId];
+                            }
+                        }
+                        
+                        // 如果优先安排主要科目在上午
+                        if (prioritizeMainSubjects && subjectToSchedule.isMain) {
+                            // 上午时段加分
+                            if (slot.period <= 3) {
+                                score += 5;
+                            }
+                        }
+                        
+                        // 更新最佳时段
+                        if (score > bestScore) {
+                            bestScore = score;
+                            bestSlot = slot;
+                        }
+                    }
+                    
+                    // 如果找到合适的时段
+                    if (bestSlot) {
+                        // 从空闲时段中移除
+                        emptySlots.splice(emptySlots.findIndex(s => s.day === bestSlot.day && s.period === bestSlot.period), 1);
+                        
+                        // 更新计数
+                        dailySubjectCount[bestSlot.day][subjectToSchedule.name]++;
+                        if (teacherId) {
+                            teacherDailyHours[bestSlot.day][teacherId]++;
+                            teacherPeriodOccupied[bestSlot.day][bestSlot.period][teacherId] = true;
+                        }
+                        
+                        // 添加到已排课列表
+                        scheduled.push({
+                            day: bestSlot.day,
+                            period: bestSlot.period,
+                            subject: subjectToSchedule.name,
+                            teacherId: teacherId
+                        });
+                    } else {
+                        // 无法为该科目找到合适的时段
+                        return { 
+                            success: false, 
+                            message: `无法为科目 ${subjectToSchedule.name} 找到合适的时段`, 
+                            scheduled: scheduled 
+                        };
+                    }
+                }
+                
+                return { success: true, message: '排课成功', scheduled: scheduled };
+            }
+            
+            // 应用排课结果
+            function applyScheduleResult(result) {
+                if (!result.success) {
+                    return false;
+                }
+                
+                result.scheduled.forEach(item => {
+                    if (!timetableData[currentGrade][item.day]) {
+                        timetableData[currentGrade][item.day] = {};
+                    }
+                    
+                    timetableData[currentGrade][item.day][item.period] = {
+                        subject: item.subject,
+                        teacherId: item.teacherId,
+                        notes: '智能排课',
+                        autoScheduled: true
+                    };
+                    
+                    // 更新UI
+                    const cell = document.querySelector(`.timetable-cell[data-day="${item.day}"][data-period="${item.period}"]`);
+                    if (cell) {
+                        updateCell(cell, timetableData[currentGrade][item.day][item.period]);
+                        cell.classList.add('auto-scheduled');
+                    }
+                });
+                
+                updateStats();
+                return true;
+            }
+            
+            // 显示排课结果
+            function showScheduleResults(result) {
+                schedulingResultsList.innerHTML = '';
+                
+                if (result.success) {
+                    const resultItem = document.createElement('li');
+                    resultItem.className = 'text-green-600';
+                    resultItem.textContent = `成功排课 ${result.scheduled.length} 节课程`;
+                    schedulingResultsList.appendChild(resultItem);
+                    
+                    // 按科目统计
+                    const subjectCounts = {};
+                    result.scheduled.forEach(item => {
+                        subjectCounts[item.subject] = (subjectCounts[item.subject] || 0) + 1;
+                    });
+                    
+                    for (const subject in subjectCounts) {
+                        const subjectItem = document.createElement('li');
+                        subjectItem.textContent = `${subject}: ${subjectCounts[subject]} 节课`;
+                        schedulingResultsList.appendChild(subjectItem);
+                    }
+                } else {
+                    const resultItem = document.createElement('li');
+                    resultItem.className = 'text-red-600';
+                    resultItem.textContent = result.message;
+                    schedulingResultsList.appendChild(resultItem);
+                    
+                    if (result.scheduled.length > 0) {
+                        const partialItem = document.createElement('li');
+                        partialItem.textContent = `已成功排课 ${result.scheduled.length} 节课程`;
+                        schedulingResultsList.appendChild(partialItem);
+                    }
+                }
+                
+                schedulingResults.classList.remove('hidden');
+                closeProgressBtn.classList.remove('hidden');
+            }
+            
+            // 智能排课按钮点击事件
+            autoScheduleBtn.addEventListener('click', () => {
+                initSubjectHoursSettings();
+                autoScheduleModal.classList.remove('hidden');
+            });
+            
+            // 取消智能排课
+            cancelAutoScheduleBtn.addEventListener('click', () => {
+                autoScheduleModal.classList.add('hidden');
+            });
+            
+            // 开始智能排课
+            startAutoScheduleBtn.addEventListener('click', () => {
+                autoScheduleModal.classList.add('hidden');
+                schedulingProgressModal.classList.remove('hidden');
+                schedulingResults.classList.add('hidden');
+                closeProgressBtn.classList.add('hidden');
+                
+                // 重置进度条
+                progressBar.style.width = '0%';
+                progressText.textContent = '准备中...';
+                
+                // 模拟排课进度
+                setTimeout(() => {
+                    progressBar.style.width = '30%';
+                    progressText.textContent = '分析现有课程...';
+                    
+                    setTimeout(() => {
+                        progressBar.style.width = '60%';
+                        progressText.textContent = '计算最佳排课方案...';
+                        
+                        setTimeout(() => {
+                            progressBar.style.width = '90%';
+                            progressText.textContent = '应用排课结果...';
+                            
+                            // 执行排课算法
+                            const result = autoSchedule();
+                            
+                            // 应用排课结果
+                            if (result.success || (result.scheduled && result.scheduled.length > 0)) {
+                                applyScheduleResult(result);
+                            }
+                            
+                            setTimeout(() => {
+                                progressBar.style.width = '100%';
+                                progressText.textContent = result.success ? '排课成功!' : '排课部分完成';
+                                
+                                // 显示排课结果
+                                showScheduleResults(result);
+                            }, 500);
+                        }, 800);
+                    }, 600);
+                }, 400);
+            });
+            
+            // 关闭进度模态框
+            closeProgressBtn.addEventListener('click', () => {
+                schedulingProgressModal.classList.add('hidden');
+            });
+            
+            // 保存和重置功能
+            const saveBtn = document.getElementById('saveBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const saveNotification = document.getElementById('saveNotification');
+            
+            saveBtn.addEventListener('click', () => {
+                localStorage.setItem('timetableData', JSON.stringify(timetableData));
+                localStorage.setItem('teachers', JSON.stringify(teachers));
+                
+                // 显示保存成功提示
+                saveNotification.classList.remove('translate-y-20', 'opacity-0');
+                saveNotification.classList.add('translate-y-0', 'opacity-100');
+                
+                setTimeout(() => {
+                    saveNotification.classList.add('translate-y-20', 'opacity-0');
+                    saveNotification.classList.remove('translate-y-0', 'opacity-100');
+                }, 3000);
+            });
+            
+            resetBtn.addEventListener('click', () => {
+                if (confirm('确定要重置当前年级的排课表吗？')) {
+                    timetableData[currentGrade] = {};
+                    loadTimetable(currentGrade);
+                    updateStats();
+                }
+            });
+            
+            // 检查教师冲突
+            function checkTeacherConflict(grade, day, period, teacherId) {
+                // 跳过当前单元格
+                const currentCellKey = `${day}-${period}`;
+                
+                // 检查同一时段其他年级是否有相同教师
+                for (let g = 1; g <= 5; g++) {
+                    if (g === grade) continue; // 跳过当前年级
+                    
+                    if (timetableData[g] && timetableData[g][day] && timetableData[g][day][period]) {
+                        const cell = timetableData[g][day][period];
+                        if (cell.teacherId === teacherId) {
+                            const teacher = teachers.find(t => t.id === teacherId);
+                            return `${teacher.name}在${g}年级的同一时段已有课程安排`;
+                        }
+                    }
+                }
+                
+                return null;
+            }
+            
+            // 显示冲突提示
+            const conflictNotification = document.getElementById('conflictNotification');
+            
+            function showConflictNotification(message) {
+                conflictNotification.textContent = message;
+                conflictNotification.classList.remove('translate-y-20', 'opacity-0');
+                conflictNotification.classList.add('translate-y-0', 'opacity-100');
+                
+                setTimeout(() => {
+                    conflictNotification.classList.add('translate-y-20', 'opacity-0');
+                    conflictNotification.classList.remove('translate-y-0', 'opacity-100');
+                }, 5000);
+            }
+            
+            // 加载保存的数据
+            const savedData = localStorage.getItem('timetableData');
+            const savedTeachers = localStorage.getItem('teachers');
+            
+            if (savedTeachers) {
+                teachers = JSON.parse(savedTeachers);
+            }
+            
+            if (savedData) {
+                timetableData = JSON.parse(savedData);
+            }
+            
+            // 初始化
+            initSubjectDropdown();
+            renderSubjectList();
+            loadTimetable(currentGrade);
+            
+            // 辅助函数
+            function loadTimetable(grade) {
+                const cells = document.querySelectorAll('.timetable-cell');
+                cells.forEach(cell => {
+                    const day = cell.dataset.day;
+                    const period = cell.dataset.period;
+                    
+                    cell.innerHTML = '';
+                    cell.className = 'border p-2 timetable-cell';
+                    
+                    if (timetableData[grade] && timetableData[grade][day] && timetableData[grade][day][period]) {
+                        updateCell(cell, timetableData[grade][day][period]);
+                    }
+                });
+                
+                updateStats();
+            }
+            
+            function updateCell(cell, data) {
+                if (!data.subject) return;
+                
+                let bgColor = 'bg-gray-100';
+                let textColor = 'text-gray-800';
+                
+                // 找到对应科目的颜色
+                const subject = subjects.find(s => s.name === data.subject);
+                if (subject) {
+                    bgColor = subject.bgColor;
+                    textColor = subject.textColor;
+                }
+                
+                cell.className = `border p-2 timetable-cell ${bgColor} ${textColor}`;
+                
+                // 如果是自动排课，添加特殊样式
+                if (data.autoScheduled) {
+                    cell.classList.add('auto-scheduled');
+                }
+                
+                // 查找教师信息
+                let teacherName = '';
+                if (data.teacherId) {
+                    const teacher = teachers.find(t => t.id === data.teacherId);
+                    if (teacher) {
+                        teacherName = teacher.name;
+                    }
+                }
+                
+                let html = `<div class="font-medium">${data.subject}</div>`;
+                
+                if (teacherName) {
+                    html += `<div class="text-sm mt-1">教师: ${teacherName}</div>`;
+                }
+                
+                if (data.notes) {
+                    html += `<div class="text-xs mt-1 italic">备注: ${data.notes}</div>`;
+                }
+                
+                cell.innerHTML = html;
+                
+                // 检查冲突并添加视觉提示
+                if (data.teacherId) {
+                    const day = cell.dataset.day;
+                    const period = cell.dataset.period;
+                    const conflict = checkTeacherConflict(currentGrade, day, period, data.teacherId);
+                    
+                    if (conflict) {
+                        cell.classList.add('conflict-warning', 'border-red-500', 'border-2');
+                    }
+                }
+            }
+            
+            function updateStats() {
+                const statsContainer = document.getElementById('statsContainer');
+                statsContainer.innerHTML = '';
+                
+                const subjectCounts = {};
+                const teacherCounts = {};
+                
+                subjects.forEach(subject => {
+                    subjectCounts[subject.name] = 0;
+                });
+                
+                teachers.forEach(teacher => {
+                    teacherCounts[teacher.id] = 0;
+                });
+                
+                // 计算每个科目和教师的课时数
+                if (timetableData[currentGrade]) {
+                    for (const day in timetableData[currentGrade]) {
+                        for (const period in timetableData[currentGrade][day]) {
+                            const cell = timetableData[currentGrade][day][period];
+                            if (cell.subject && subjectCounts.hasOwnProperty(cell.subject)) {
+                                subjectCounts[cell.subject]++;
+                            }
+                            if (cell.teacherId && teacherCounts.hasOwnProperty(cell.teacherId)) {
+                                teacherCounts[cell.teacherId]++;
+                            }
+                        }
+                    }
+                }
+                
+                // 创建统计卡片
+                subjects.forEach(subject => {
+                    // 找到该科目的教师
+                    const subjectTeachers = teachers.filter(teacher => teacher.subject === subject.name);
+                    const teacherNames = subjectTeachers.map(teacher => {
+                        const count = teacherCounts[teacher.id] || 0;
+                        return `${teacher.name} (${count}课时)`;
+                    }).join(', ');
+                    
+                    const card = document.createElement('div');
+                    card.className = `${subject.bgColor.replace('bg-', 'bg-opacity-70 bg-')} ${subject.textColor} rounded-lg p-4 shadow-sm`;
+                    card.innerHTML = `
+                        <div class="font-medium">${subject.name}</div>
+                        <div class="text-2xl font-bold mt-1">${subjectCounts[subject.name]} 课时</div>
+                        <div class="text-xs mt-2">${teacherNames || '无教师'}</div>
+                    `;
+                    
+                    statsContainer.appendChild(card);
+                });
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96176056317f4f1e',t:'MTc1Mjg5ODMwMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
