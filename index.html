@@ -84,19 +84,19 @@
         <header class="bg-white shadow-md">
             <div class="container mx-auto px-4 py-6">
                 <div class="flex flex-col md:flex-row md:justify-between md:items-center">
-                    <h1 class="text-2xl md:text-3xl font-bold text-indigo-800 mb-4 md:mb-0">ABC课程排课系统</h1>
+                    <h1 class="text-2xl md:text-3xl font-bold text-indigo-800 mb-4 md:mb-0">ABC课程排课系统<br><span class="text-lg font-normal text-indigo-600">ABC Course Scheduling System</span></h1>
                     <div class="flex flex-wrap gap-2">
                         <button id="teacherManageBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md shadow transition">
-                            教师管理
+                            教师管理<br><span class="text-xs">Teacher Management</span>
                         </button>
                         <button id="autoScheduleBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md shadow transition">
-                            智能排课
+                            智能排课<br><span class="text-xs">Auto Schedule</span>
                         </button>
                         <button id="saveBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md shadow transition">
-                            保存排课
+                            保存排课<br><span class="text-xs">Save Schedule</span>
                         </button>
                         <button id="resetBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md shadow transition">
-                            重置
+                            重置<br><span class="text-xs">Reset</span>
                         </button>
                     </div>
                 </div>
@@ -107,18 +107,18 @@
             <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
                 <div class="flex flex-wrap gap-4 mb-6">
                     <div class="w-full md:w-1/2 lg:w-1/3">
-                        <h2 class="text-lg font-semibold text-gray-700 mb-3">选择年级</h2>
+                        <h2 class="text-lg font-semibold text-gray-700 mb-3">选择年级<br><span class="text-sm font-normal text-gray-500">Select Grade</span></h2>
                         <div class="flex flex-wrap gap-2" id="gradeTabs">
-                            <button class="grade-tab px-4 py-2 rounded-md bg-gray-200 hover:bg-blue-500 hover:text-white transition" data-grade="1">一年级</button>
-                            <button class="grade-tab px-4 py-2 rounded-md bg-gray-200 hover:bg-blue-500 hover:text-white transition" data-grade="2">二年级</button>
-                            <button class="grade-tab px-4 py-2 rounded-md bg-gray-200 hover:bg-blue-500 hover:text-white transition" data-grade="3">三年级</button>
-                            <button class="grade-tab px-4 py-2 rounded-md bg-gray-200 hover:bg-blue-500 hover:text-white transition" data-grade="4">四年级</button>
-                            <button class="grade-tab px-4 py-2 rounded-md bg-gray-200 hover:bg-blue-500 hover:text-white transition" data-grade="5">五年级</button>
+                            <button class="grade-tab px-4 py-2 rounded-md bg-gray-200 hover:bg-blue-500 hover:text-white transition" data-grade="1">一年级<br><span class="text-xs">Grade 1</span></button>
+                            <button class="grade-tab px-4 py-2 rounded-md bg-gray-200 hover:bg-blue-500 hover:text-white transition" data-grade="2">二年级<br><span class="text-xs">Grade 2</span></button>
+                            <button class="grade-tab px-4 py-2 rounded-md bg-gray-200 hover:bg-blue-500 hover:text-white transition" data-grade="3">三年级<br><span class="text-xs">Grade 3</span></button>
+                            <button class="grade-tab px-4 py-2 rounded-md bg-gray-200 hover:bg-blue-500 hover:text-white transition" data-grade="4">四年级<br><span class="text-xs">Grade 4</span></button>
+                            <button class="grade-tab px-4 py-2 rounded-md bg-gray-200 hover:bg-blue-500 hover:text-white transition" data-grade="5">五年级<br><span class="text-xs">Grade 5</span></button>
                         </div>
                     </div>
                     
                     <div class="w-full md:w-1/2 lg:w-2/3">
-                        <h2 class="text-lg font-semibold text-gray-700 mb-3">可用科目</h2>
+                        <h2 class="text-lg font-semibold text-gray-700 mb-3">可用科目<br><span class="text-sm font-normal text-gray-500">Available Subjects</span></h2>
                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2" id="subjectList">
                             <!-- 科目列表将通过JS动态生成 -->
                         </div>
@@ -129,12 +129,12 @@
                     <table class="w-full border-collapse">
                         <thead>
                             <tr>
-                                <th class="border p-2 bg-gray-100">时段 / 星期</th>
-                                <th class="border p-2 bg-gray-100">星期一</th>
-                                <th class="border p-2 bg-gray-100">星期二</th>
-                                <th class="border p-2 bg-gray-100">星期三</th>
-                                <th class="border p-2 bg-gray-100">星期四</th>
-                                <th class="border p-2 bg-gray-100">星期五</th>
+                                <th class="border p-2 bg-gray-100">时段 / 星期<br><span class="text-xs">Time / Day</span></th>
+                                <th class="border p-2 bg-gray-100">星期一<br><span class="text-xs">Monday</span></th>
+                                <th class="border p-2 bg-gray-100">星期二<br><span class="text-xs">Tuesday</span></th>
+                                <th class="border p-2 bg-gray-100">星期三<br><span class="text-xs">Wednesday</span></th>
+                                <th class="border p-2 bg-gray-100">星期四<br><span class="text-xs">Thursday</span></th>
+                                <th class="border p-2 bg-gray-100">星期五<br><span class="text-xs">Friday</span></th>
                             </tr>
                         </thead>
                         <tbody id="timetableBody">
@@ -208,7 +208,7 @@
             </div>
 
             <div class="bg-white rounded-lg shadow-lg p-6">
-                <h2 class="text-xl font-bold text-gray-800 mb-4">课程统计</h2>
+                <h2 class="text-xl font-bold text-gray-800 mb-4">课程统计<br><span class="text-lg font-normal text-gray-600">Course Statistics</span></h2>
                 <div id="statsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <!-- 统计信息将通过JS动态生成 -->
                 </div>
@@ -218,35 +218,35 @@
         <!-- 编辑课程的模态框 -->
         <div id="editModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
             <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">编辑课程</h3>
+                <h3 class="text-xl font-bold text-gray-800 mb-4">编辑课程<br><span class="text-lg font-normal text-gray-600">Edit Course</span></h3>
                 <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">选择科目:</label>
+                    <label class="block text-gray-700 mb-2">选择科目:<br><span class="text-sm text-gray-500">Select Subject:</span></label>
                     <select id="editSubject" class="w-full p-2 border rounded-md">
-                        <option value="">-- 请选择科目 --</option>
+                        <option value="">-- 请选择科目 --<br><span class="text-xs">-- Please Select Subject --</span></option>
                         <!-- 科目选项将通过JS动态生成 -->
                     </select>
                 </div>
                 <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">教师:</label>
+                    <label class="block text-gray-700 mb-2">教师:<br><span class="text-sm text-gray-500">Teacher:</span></label>
                     <select id="editTeacher" class="w-full p-2 border rounded-md">
-                        <option value="">-- 请选择教师 --</option>
+                        <option value="">-- 请选择教师 --<br><span class="text-xs">-- Please Select Teacher --</span></option>
                         <!-- 教师选项将通过JS动态生成 -->
                     </select>
                 </div>
                 <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">备注:</label>
-                    <textarea id="editNotes" class="w-full p-2 border rounded-md" rows="2" placeholder="添加备注"></textarea>
+                    <label class="block text-gray-700 mb-2">备注:<br><span class="text-sm text-gray-500">Notes:</span></label>
+                    <textarea id="editNotes" class="w-full p-2 border rounded-md" rows="2" placeholder="添加备注 / Add notes"></textarea>
                 </div>
                 <div id="conflictWarning" class="mb-4 hidden">
                     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-                        <strong class="font-bold">警告!</strong>
+                        <strong class="font-bold">警告! / Warning!</strong>
                         <span class="block sm:inline" id="conflictMessage"></span>
                     </div>
                 </div>
                 <div class="flex justify-end space-x-2">
-                    <button id="deleteBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md">删除</button>
-                    <button id="cancelBtn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md">取消</button>
-                    <button id="saveEditBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">保存</button>
+                    <button id="deleteBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md">删除<br><span class="text-xs">Delete</span></button>
+                    <button id="cancelBtn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md">取消<br><span class="text-xs">Cancel</span></button>
+                    <button id="saveEditBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">保存<br><span class="text-xs">Save</span></button>
                 </div>
             </div>
         </div>
@@ -254,65 +254,65 @@
         <!-- 教师管理模态框 -->
         <div id="teacherModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
             <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">教师管理</h3>
+                <h3 class="text-xl font-bold text-gray-800 mb-4">教师管理<br><span class="text-lg font-normal text-gray-600">Teacher Management</span></h3>
                 <div class="mb-6">
                     <div class="flex flex-wrap gap-4 mb-4">
                         <div class="w-full md:w-1/3">
-                            <label class="block text-gray-700 mb-2">教师姓名:</label>
-                            <input type="text" id="newTeacherName" class="w-full p-2 border rounded-md" placeholder="输入教师姓名">
+                            <label class="block text-gray-700 mb-2">教师姓名:<br><span class="text-sm text-gray-500">Teacher Name:</span></label>
+                            <input type="text" id="newTeacherName" class="w-full p-2 border rounded-md" placeholder="输入教师姓名 / Enter teacher name">
                         </div>
                         <div class="w-full md:w-1/3">
-                            <label class="block text-gray-700 mb-2">教授科目:</label>
+                            <label class="block text-gray-700 mb-2">教授科目:<br><span class="text-sm text-gray-500">Subject:</span></label>
                             <select id="newTeacherSubject" class="w-full p-2 border rounded-md">
-                                <option value="">-- 请选择科目 --</option>
+                                <option value="">-- 请选择科目 --<br><span class="text-xs">-- Please Select Subject --</span></option>
                                 <!-- 科目选项将通过JS动态生成 -->
                             </select>
                         </div>
                         <div class="w-full md:w-1/3 flex items-end">
-                            <button id="addTeacherBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md w-full">添加教师</button>
+                            <button id="addTeacherBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md w-full">添加教师<br><span class="text-xs">Add Teacher</span></button>
                         </div>
                     </div>
                     
                     <div class="mb-6">
-                        <h4 class="font-semibold text-gray-700 mb-2">教师偏好设置:</h4>
+                        <h4 class="font-semibold text-gray-700 mb-2">教师偏好设置:<br><span class="text-sm font-normal text-gray-500">Teacher Preferences:</span></h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="p-4 border rounded-md bg-gray-50">
-                                <div class="mb-2 font-medium">时段偏好</div>
+                                <div class="mb-2 font-medium">时段偏好<br><span class="text-sm text-gray-500">Time Preferences</span></div>
                                 <div class="space-y-2">
                                     <div class="flex items-center">
                                         <input type="checkbox" id="newTeacherNoEarlyClass" class="mr-2">
-                                        <label for="newTeacherNoEarlyClass">不要早课 (8:00-10:00)</label>
+                                        <label for="newTeacherNoEarlyClass">不要早课 (8:00-10:00)<br><span class="text-xs text-gray-500">No Early Classes</span></label>
                                     </div>
                                     <div class="flex items-center">
                                         <input type="checkbox" id="newTeacherNoLateClass" class="mr-2">
-                                        <label for="newTeacherNoLateClass">不要晚课 (18:00-20:00)</label>
+                                        <label for="newTeacherNoLateClass">不要晚课 (18:00-20:00)<br><span class="text-xs text-gray-500">No Late Classes</span></label>
                                     </div>
                                 </div>
                             </div>
                             <div class="p-4 border rounded-md bg-gray-50">
-                                <div class="mb-2 font-medium">排课偏好</div>
+                                <div class="mb-2 font-medium">排课偏好<br><span class="text-sm text-gray-500">Scheduling Preferences</span></div>
                                 <div class="space-y-2">
                                     <div class="flex items-center">
                                         <input type="checkbox" id="newTeacherNoThreeConsecutive" class="mr-2">
-                                        <label for="newTeacherNoThreeConsecutive">不要三堂课连上</label>
+                                        <label for="newTeacherNoThreeConsecutive">不要三堂课连上<br><span class="text-xs text-gray-500">No Three Consecutive Classes</span></label>
                                     </div>
                                     <div class="flex items-center">
                                         <input type="checkbox" id="newTeacherNoGaps" class="mr-2">
-                                        <label for="newTeacherNoGaps">希望中间没有空档</label>
+                                        <label for="newTeacherNoGaps">希望中间没有空档<br><span class="text-xs text-gray-500">No Gaps Between Classes</span></label>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="mt-4 p-4 border rounded-md bg-gray-50">
-                            <div class="mb-2 font-medium">每周课时偏好</div>
+                            <div class="mb-2 font-medium">每周课时偏好<br><span class="text-sm text-gray-500">Weekly Hours Preference</span></div>
                             <div class="flex items-center">
-                                <label for="newTeacherWeeklyHours" class="mr-2">理想每周课时数:</label>
+                                <label for="newTeacherWeeklyHours" class="mr-2">理想每周课时数:<br><span class="text-xs text-gray-500">Ideal Weekly Hours:</span></label>
                                 <input type="number" id="newTeacherWeeklyHours" class="w-20 p-2 border rounded-md" min="1" max="40" value="20">
-                                <span class="ml-2 text-sm text-gray-500">(建议值: 15-25)</span>
+                                <span class="ml-2 text-sm text-gray-500">(建议值: 15-25)<br><span class="text-xs">(Recommended: 15-25)</span></span>
                             </div>
                             <div class="mt-2 text-sm text-gray-600">
-                                设置教师每周理想的课时数量，智能排课时会尽量满足此偏好
+                                设置教师每周理想的课时数量，智能排课时会尽量满足此偏好<br><span class="text-xs text-gray-500">Set teacher's ideal weekly hours, auto-scheduling will try to meet this preference</span>
                             </div>
                         </div>
                     </div>
@@ -321,10 +321,10 @@
                         <table class="min-w-full bg-white border">
                             <thead>
                                 <tr>
-                                    <th class="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left">教师姓名</th>
-                                    <th class="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left">教授科目</th>
-                                    <th class="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left">教师偏好</th>
-                                    <th class="py-2 px-4 border-b border-gray-200 bg-gray-100 text-center">操作</th>
+                                    <th class="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left">教师姓名<br><span class="text-xs">Teacher Name</span></th>
+                                    <th class="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left">教授科目<br><span class="text-xs">Subject</span></th>
+                                    <th class="py-2 px-4 border-b border-gray-200 bg-gray-100 text-left">教师偏好<br><span class="text-xs">Preferences</span></th>
+                                    <th class="py-2 px-4 border-b border-gray-200 bg-gray-100 text-center">操作<br><span class="text-xs">Actions</span></th>
                                 </tr>
                             </thead>
                             <tbody id="teacherTableBody">
@@ -334,70 +334,78 @@
                     </div>
                 </div>
                 <div class="flex justify-end">
-                    <button id="closeTeacherModalBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">关闭</button>
+                    <button id="closeTeacherModalBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">关闭<br><span class="text-xs">Close</span></button>
                 </div>
             </div>
         </div>
 
         <!-- 智能排课模态框 -->
         <div id="autoScheduleModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-            <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">智能排课设置</h3>
+            <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">智能排课设置<br><span class="text-lg font-normal text-gray-600">Auto Schedule Settings</span></h3>
                 
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">科目课时分配:</label>
-                    <div id="subjectHoursContainer" class="space-y-2">
-                        <!-- 科目课时设置将通过JS动态生成 -->
+                <div class="flex flex-col lg:flex-row gap-6">
+                    <!-- 左侧：科目课时分配 -->
+                    <div class="flex-1">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 mb-2">科目课时分配:<br><span class="text-sm text-gray-500">Subject Hours Allocation:</span></label>
+                            <div id="subjectHoursContainer" class="space-y-2">
+                                <!-- 科目课时设置将通过JS动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 右侧：排课规则和教师偏好 -->
+                    <div class="flex-1">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 mb-2">排课规则:<br><span class="text-sm text-gray-500">Scheduling Rules:</span></label>
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="avoidConflicts" class="mr-2" checked>
+                                    <label for="avoidConflicts">避免教师冲突<br><span class="text-xs text-gray-500">Avoid Teacher Conflicts</span></label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="balanceSubjects" class="mr-2" checked>
+                                    <label for="balanceSubjects">平衡每日科目分布<br><span class="text-xs text-gray-500">Balance Daily Subject Distribution</span></label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="prioritizeMainSubjects" class="mr-2" checked>
+                                    <label for="prioritizeMainSubjects">优先安排主要科目在上午时段<br><span class="text-xs text-gray-500">Prioritize Main Subjects in Morning</span></label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-gray-700 mb-2">教师偏好设置:<br><span class="text-sm text-gray-500">Teacher Preference Settings:</span></label>
+                            <div class="space-y-2">
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="respectNoEarlyClass" class="mr-2" checked>
+                                    <label for="respectNoEarlyClass">尊重"不要早课"偏好<br><span class="text-xs text-gray-500">Respect "No Early Classes" Preference</span></label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="respectNoLateClass" class="mr-2" checked>
+                                    <label for="respectNoLateClass">尊重"不要晚课"偏好<br><span class="text-xs text-gray-500">Respect "No Late Classes" Preference</span></label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="respectNoThreeConsecutive" class="mr-2" checked>
+                                    <label for="respectNoThreeConsecutive">尊重"不要三堂课连上"偏好<br><span class="text-xs text-gray-500">Respect "No Three Consecutive" Preference</span></label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="respectNoGaps" class="mr-2" checked>
+                                    <label for="respectNoGaps">尊重"中间没有空档"偏好<br><span class="text-xs text-gray-500">Respect "No Gaps" Preference</span></label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="respectWeeklyHours" class="mr-2" checked>
+                                    <label for="respectWeeklyHours">尊重"每周课时数"偏好<br><span class="text-xs text-gray-500">Respect "Weekly Hours" Preference</span></label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">排课规则:</label>
-                    <div class="space-y-2">
-                        <div class="flex items-center">
-                            <input type="checkbox" id="avoidConflicts" class="mr-2" checked>
-                            <label for="avoidConflicts">避免教师冲突</label>
-                        </div>
-                        <div class="flex items-center">
-                            <input type="checkbox" id="balanceSubjects" class="mr-2" checked>
-                            <label for="balanceSubjects">平衡每日科目分布</label>
-                        </div>
-                        <div class="flex items-center">
-                            <input type="checkbox" id="prioritizeMainSubjects" class="mr-2" checked>
-                            <label for="prioritizeMainSubjects">优先安排主要科目在上午时段</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">教师偏好设置:</label>
-                    <div class="space-y-2">
-                        <div class="flex items-center">
-                            <input type="checkbox" id="respectNoEarlyClass" class="mr-2" checked>
-                            <label for="respectNoEarlyClass">尊重"不要早课"偏好</label>
-                        </div>
-                        <div class="flex items-center">
-                            <input type="checkbox" id="respectNoLateClass" class="mr-2" checked>
-                            <label for="respectNoLateClass">尊重"不要晚课"偏好</label>
-                        </div>
-                        <div class="flex items-center">
-                            <input type="checkbox" id="respectNoThreeConsecutive" class="mr-2" checked>
-                            <label for="respectNoThreeConsecutive">尊重"不要三堂课连上"偏好</label>
-                        </div>
-                        <div class="flex items-center">
-                            <input type="checkbox" id="respectNoGaps" class="mr-2" checked>
-                            <label for="respectNoGaps">尊重"中间没有空档"偏好</label>
-                        </div>
-                        <div class="flex items-center">
-                            <input type="checkbox" id="respectWeeklyHours" class="mr-2" checked>
-                            <label for="respectWeeklyHours">尊重"每周课时数"偏好</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="flex justify-end space-x-2">
-                    <button id="cancelAutoScheduleBtn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md">取消</button>
-                    <button id="startAutoScheduleBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md">开始排课</button>
+                <div class="flex justify-end space-x-2 mt-6">
+                    <button id="cancelAutoScheduleBtn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md">取消<br><span class="text-xs">Cancel</span></button>
+                    <button id="startAutoScheduleBtn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md">开始排课<br><span class="text-xs">Start Scheduling</span></button>
                 </div>
             </div>
         </div>
@@ -405,31 +413,31 @@
         <!-- 排课进度模态框 -->
         <div id="schedulingProgressModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
             <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md text-center">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">正在进行智能排课</h3>
+                <h3 class="text-xl font-bold text-gray-800 mb-4">正在进行智能排课<br><span class="text-lg font-normal text-gray-600">Auto Scheduling in Progress</span></h3>
                 <div class="mb-4">
                     <div class="w-full bg-gray-200 rounded-full h-4">
                         <div id="progressBar" class="bg-purple-600 h-4 rounded-full" style="width: 0%"></div>
                     </div>
-                    <p id="progressText" class="mt-2">准备中...</p>
+                    <p id="progressText" class="mt-2">准备中...<br><span class="text-sm text-gray-500">Preparing...</span></p>
                 </div>
                 <div id="schedulingResults" class="mb-4 text-left hidden">
-                    <h4 class="font-semibold mb-2">排课结果:</h4>
+                    <h4 class="font-semibold mb-2">排课结果:<br><span class="text-sm text-gray-500">Scheduling Results:</span></h4>
                     <ul id="schedulingResultsList" class="list-disc pl-5 space-y-1">
                         <!-- 排课结果将通过JS动态生成 -->
                     </ul>
                 </div>
-                <button id="closeProgressBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md hidden">关闭</button>
+                <button id="closeProgressBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md hidden">关闭<br><span class="text-xs">Close</span></button>
             </div>
         </div>
 
         <!-- 保存成功提示 -->
         <div id="saveNotification" class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-md shadow-lg transform translate-y-20 opacity-0 transition-all duration-300">
-            排课表已成功保存！
+            排课表已成功保存！<br><span class="text-sm">Schedule saved successfully!</span>
         </div>
         
         <!-- 冲突提示 -->
         <div id="conflictNotification" class="fixed bottom-4 right-4 bg-red-500 text-white px-6 py-3 rounded-md shadow-lg transform translate-y-20 opacity-0 transition-all duration-300">
-            检测到教师课程冲突！
+            检测到教师课程冲突！<br><span class="text-sm">Teacher conflict detected!</span>
         </div>
     </div>
 
@@ -440,7 +448,7 @@
             let timetableData = {};
             let currentCell = null;
             let teachers = [
-                { id: 1, name: '林老师', subject: '马来语', preferences: { weeklyHours: 20 } },
+                { id: 1, name: '叶老师', subject: '马来语', preferences: { weeklyHours: 20 } },
                 { id: 2, name: '王老师', subject: '英语', preferences: { weeklyHours: 18 } },
                 { id: 3, name: '张老师', subject: '数学', preferences: { weeklyHours: 22 } },
                 { id: 4, name: '李老师', subject: '科学', preferences: { weeklyHours: 15 } },
@@ -489,7 +497,7 @@
                     
                     subjectItem.innerHTML = `
                         <div class="font-medium">${subject.name}</div>
-                        <div class="text-xs mt-1">${teacherNames || '无教师'}</div>
+                        <div class="text-xs mt-1">${teacherNames || '无教师 / No Teacher'}</div>
                     `;
                     
                     subjectItem.addEventListener('dragstart', (e) => {
@@ -505,8 +513,8 @@
                 const editSubject = document.getElementById('editSubject');
                 const newTeacherSubject = document.getElementById('newTeacherSubject');
                 
-                editSubject.innerHTML = '<option value="">-- 请选择科目 --</option>';
-                newTeacherSubject.innerHTML = '<option value="">-- 请选择科目 --</option>';
+                editSubject.innerHTML = '<option value="">-- 请选择科目 --<br><span class="text-xs">-- Please Select Subject --</span></option>';
+                newTeacherSubject.innerHTML = '<option value="">-- 请选择科目 --<br><span class="text-xs">-- Please Select Subject --</span></option>';
                 
                 subjects.forEach(subject => {
                     const option = document.createElement('option');
@@ -521,7 +529,7 @@
             // 更新教师下拉菜单
             function updateTeacherDropdown(selectedSubject = '') {
                 const editTeacher = document.getElementById('editTeacher');
-                editTeacher.innerHTML = '<option value="">-- 请选择教师 --</option>';
+                editTeacher.innerHTML = '<option value="">-- 请选择教师 --<br><span class="text-xs">-- Please Select Teacher --</span></option>';
                 
                 if (selectedSubject) {
                     const filteredTeachers = teachers.filter(teacher => teacher.subject === selectedSubject);
@@ -557,7 +565,7 @@
                     if (preferences.noGaps) preferenceLabels.push('中间无空档');
                     if (preferences.weeklyHours) preferenceLabels.push(`每周${preferences.weeklyHours}课时`);
                     
-                    const preferencesText = preferenceLabels.length > 0 ? preferenceLabels.join(', ') : '无特殊偏好';
+                    const preferencesText = preferenceLabels.length > 0 ? preferenceLabels.join(', ') : '无特殊偏好 / No Special Preferences';
                     
                     // 计算当前教师的总课时数
                     const currentHours = calculateTeacherTotalHours(teacher.id);
@@ -568,7 +576,7 @@
                         <td class="py-2 px-4 border-b border-gray-200">${teacher.subject}</td>
                         <td class="py-2 px-4 border-b border-gray-200">
                             ${preferencesText}
-                            <div class="text-xs mt-1 text-gray-600">当前课时: ${currentHours}</div>
+                            <div class="text-xs mt-1 text-gray-600">当前课时 / Current Hours: ${currentHours}</div>
                         </td>
                         <td class="py-2 px-4 border-b border-gray-200 text-center">
                             <button class="edit-teacher-btn bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded-md text-sm mr-1" data-id="${teacher.id}">编辑</button>
@@ -1600,20 +1608,20 @@
                 
                 // 重置进度条
                 progressBar.style.width = '0%';
-                progressText.textContent = '准备中...';
+                                    progressText.innerHTML = '准备中...<br><span class="text-sm text-gray-500">Preparing...</span>';
                 
                 // 模拟排课进度
                 setTimeout(() => {
                     progressBar.style.width = '30%';
-                    progressText.textContent = '分析现有课程...';
+                    progressText.innerHTML = '分析现有课程...<br><span class="text-sm text-gray-500">Analyzing existing courses...</span>';
                     
                     setTimeout(() => {
                         progressBar.style.width = '60%';
-                        progressText.textContent = '计算最佳排课方案...';
+                        progressText.innerHTML = '计算最佳排课方案...<br><span class="text-sm text-gray-500">Calculating optimal schedule...</span>';
                         
                         setTimeout(() => {
                             progressBar.style.width = '90%';
-                            progressText.textContent = '应用排课结果...';
+                            progressText.innerHTML = '应用排课结果...<br><span class="text-sm text-gray-500">Applying schedule results...</span>';
                             
                             // 执行排课算法
                             const result = autoSchedule();
@@ -1625,7 +1633,7 @@
                             
                             setTimeout(() => {
                                 progressBar.style.width = '100%';
-                                progressText.textContent = result.success ? '排课成功!' : '排课部分完成';
+                                progressText.innerHTML = result.success ? '排课成功!<br><span class="text-sm text-gray-500">Scheduling successful!</span>' : '排课部分完成<br><span class="text-sm text-gray-500">Scheduling partially completed</span>';
                                 
                                 // 显示排课结果
                                 showScheduleResults(result);
@@ -1660,7 +1668,7 @@
             });
             
             resetBtn.addEventListener('click', () => {
-                if (confirm('确定要重置当前年级的排课表吗？')) {
+                if (confirm('确定要重置当前年级的排课表吗？\nAre you sure you want to reset the current grade schedule?')) {
                     timetableData[currentGrade] = {};
                     loadTimetable(currentGrade);
                     updateStats();
@@ -1783,11 +1791,11 @@
                 let html = `<div class="font-medium">${data.subject}</div>`;
                 
                 if (teacherName) {
-                    html += `<div class="text-sm mt-1">教师: ${teacherName}</div>`;
+                    html += `<div class="text-sm mt-1">教师 / Teacher: ${teacherName}</div>`;
                 }
                 
                 if (data.notes) {
-                    html += `<div class="text-xs mt-1 italic">备注: ${data.notes}</div>`;
+                    html += `<div class="text-xs mt-1 italic">备注 / Notes: ${data.notes}</div>`;
                 }
                 
                 cell.innerHTML = html;
@@ -1857,8 +1865,8 @@
                     card.className = `${subject.bgColor.replace('bg-', 'bg-opacity-70 bg-')} ${subject.textColor} rounded-lg p-4 shadow-sm`;
                     card.innerHTML = `
                         <div class="font-medium">${subject.name}</div>
-                        <div class="text-2xl font-bold mt-1">${subjectCounts[subject.name]} 课时</div>
-                        <div class="text-xs mt-2">${teacherNames || '无教师'}</div>
+                        <div class="text-2xl font-bold mt-1">${subjectCounts[subject.name]} 课时<br><span class="text-sm">Hours</span></div>
+                        <div class="text-xs mt-2">${teacherNames || '无教师 / No Teacher'}</div>
                     `;
                     
                     statsContainer.appendChild(card);
